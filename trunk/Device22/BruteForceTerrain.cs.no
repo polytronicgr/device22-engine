@@ -1,0 +1,38 @@
+﻿private int terrainSize = 257;      // (2^N) + 1
+public Vertex3[,] terrainData;
+
+public void generateTerrain()
+{
+    terrainData = new Vertex3[terrainSize, terrainSize];
+
+    Bitmap bitmap = new Bitmap("terrainHeightmap.jpg");
+
+    for (int z = 0; z < terrainSize; z++)
+    {
+        for (int x = 0; x < terrainSize; x++)
+        {
+            // Since the heightmap is in greyscales, we can use any color channel
+            int height = bitmap.GetPixel(x, z).R;
+            terrainData[x, z] = new Vertex3();
+            terrainData[x, z].X = x;
+            terrainData[x, z].Y = height;
+            terrainData[x, z].Z = z;
+        }
+    }
+}
+        
+public void BruteForceRender()
+{
+    for (int z = 0; z < terrainSize; z++)
+    {
+        GL.Begin(BeginMode.TriangleStrip);
+        for (int x = 0; x < terrainSize; x++)
+        {
+            Vertex3 v1 = terrainData[x + 1, z];
+            Vertex3 v2 = terrainData[x, z];
+            GL.Vertex3(v1.X, v1.Y, v1.Z);
+            GL.Vertex3(v2.X, v2.Y, v2.Z);
+        }
+        GL.End();
+    }
+}

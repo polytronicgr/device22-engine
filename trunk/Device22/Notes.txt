@@ -1,0 +1,116 @@
+﻿Optimierung besteht aus:
+	Quadtree
+	Backface Culling (muss jedoch nur für die bridges ausgeschaltet werden!)
+	Frustum Culling
+	Geomipmapping
+
+Kommentare auf Englisch und Punkt/Komma überprüfen! Dies dann auch in der BA ändern!
+
+Quadtree + PVS + crack avoiding (GeoMorphing) implemenieren!
+
+Vertex Array -> Vertex Buffer umwandeln? (d.h. Indices auf die GPU umlagern -> zu viel RAMverbrauch?)
+
+Groß- und Kleinschreibung von Funktionsnamen (Allgemein auch!)
+
+Destructor? Oder Räumt der Garbage Collector und der OGLTreiber alles auf?
+
+Terrain-Class: Vbo Struct benutzten
+
+Float -> Double?
+
+Was passiert, wenn die Anzahl der Nodes nicht durch 4^x darstellbar ist?
+
+Terrain LOD nach Höhe des Patches UND nach Entfernung zur Camera
+
+Wenn Farbe nicht angezeigt wird: Von byte zu float wechseln! (Interner OpenTK Fehler?)
+
+Occlusion Culling?
+
+Objekte nicht rendern, wenn Screen-Space-Größe > 1px
+
+AABB Frustum Culling überprüfen!
+
+Patchbridges mit FrontFaceCulling anpassen
+
+Normal Map?
+
+Benchmarking:
+	Wie groß kann das Terrain maximal sein?
+	Speichernutzung dazu?
+	FPS mit/ohne Quadtree/Geomipmaping
+
+
+float Verlgeich mit einem treshhold wert ergänzen, da float-pointing sehr ungenau sind
+
+
+!!!!!!!!!!
+
+Indicescounts auf die neuen Patches mit dem Crackfix anpassen!
+
+!!!!!!!!!!
+
+Patches kennen die Nachbarn über ref. Gibt es einen besseren Weg?
+
+OGL Optimization:
+http://www.opentk.com/node/323
+
+Frustum Culling: Zuerst check auf Sphere, dann auf Box.
+Und: Unterscheidung zwischen drinnen oder nur intersecting
+http://www.flipcode.com/archives/Frustum_Culling.shtml
+http://www.hackchina.com/en/r/149183/Frustum.cpp__html
+
+Terrain -> Cube -> Planet
+http://britonia.wordpress.com/2010/05/20/planet-geometry/
+
+Nicht vergessen: Terrain Größe == Heightmap Größe!
+
+!!! Klassen auf mehrere Datein aufteilen !!!
+
+Float oder Double für Entfernungen?
+
+ApplicationException oder Core.ErrorExit ?
+
+Manage Imports!
+
+Kommentare von Englisch -> Deutsch
+
+Planetenverkrümung: Bounding box muss mit berechnet werden!
+
+Terrain Heightmap generieren:
+http://www.chadvernon.com/blog/resources/directx9/terrain-generation-with-a-heightmap/
+http://www.toymaker.info/Games/XNA/html/xna_terrain.html
+
+Frustum nur neuberechnen, wenn die Kamera sich bewegt
+
+Extra:
+Time-Based Movements
+
+Geomipmapping:
+http://www.gamedev.net/topic/447118-geomipmap-implementation/
+
+Quadtree:
+http://www.gamedev.net/page/resources/_/reference/programming/140/algorithms-and-data-structures/quadtrees-r1303
+
+Quadtree Stiching:
+http://www.gamedev.net/topic/597910-quadtree-terrain-stitching/
+http://www.gamedev.net/topic/423455-skirt-vs-fixes-geomipmaps/
+http://www.gamedev.net/topic/381214-geomipmapping-and-cracking/
+http://www.gamedev.net/topic/254087-fix-cracks-in-geomipmapping/
+
+Quadtree Nachbarn finden:
+http://www.gamedev.net/topic/597910-quadtree-terrain-stitching/
+http://cboard.cprogramming.com/game-programming/103165-quad-tree-neighbors-solved.html
+
+
+Quellen:
+http://www.gamedev.net/page/resources/_/reference/programming/140/algorithms-and-data-structures/quadtrees-r1303
+http://www.rastertek.com/tertut06.html
+GameTutorials LLC.
+
+
+
+
+Now what does that mean for you? The size of a struct type is the combined size of its members, it does not point to a memory address, unlike the class type.
+Using a struct will change the semantics of your type's behavior - if you assign one struct instance to another of the same type (same for any other value type),
+all values in the struct will be copied from one to the other, you still have two separate object instances. - for a reference type on the other hand both would point
+to the same object afterwards.
