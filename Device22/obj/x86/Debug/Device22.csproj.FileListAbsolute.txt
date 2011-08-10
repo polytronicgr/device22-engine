@@ -1,0 +1,9 @@
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\OpenTK.dll
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\OpenTK.GLControl.dll
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\OpenTK.xml
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\OpenTK.GLControl.xml
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\obj\x86\Debug\ResolveAssemblyReference.cache
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\Device22.exe
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\bin\Debug\Device22.pdb
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\obj\x86\Debug\Device22.exe
+F:\-= Developpment =-\GameDev\C#\Projects\Device22\Device22\obj\x86\Debug\Device22.pdb
