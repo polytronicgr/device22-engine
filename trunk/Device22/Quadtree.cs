@@ -410,8 +410,8 @@ namespace Device22
                 //GL.Scale(terrainRef.scale);
                 //GL.Translate(terrainRef.position);
 
-                GL.Disable(EnableCap.Lighting);
-                GL.Color4(1.0, 1.0, 1.0, 0);
+                GL.Enable(EnableCap.Lighting);
+                GL.Color4(1.0, 1.0, 1.0, 1.0);
 
                 GL.EnableClientState(ArrayCap.VertexArray);
                 GL.EnableClientState(ArrayCap.TextureCoordArray);
@@ -420,6 +420,10 @@ namespace Device22
                 {
                     Texture.Bind(terrainRef.TextureID);
                     GL.Enable(EnableCap.Texture2D);
+                }
+                else
+                {
+                    GL.Color3(0, 255, 0);
                 }
 
                 CheckNodeInsideFrustum(ref frustum, ref mainNode, checkFrustum);
