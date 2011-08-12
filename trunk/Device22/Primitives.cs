@@ -284,6 +284,7 @@ namespace Device22
                 GL.Disable(EnableCap.Lighting);
                 GL.PushMatrix();
                 GL.Translate(this.pos.X, this.pos.Y, this.pos.Z);
+                GL.Scale(this.scale.X, this.scale.Y, this.scale.Z);
                 GL.Color4(this.color.R, this.color.G, this.color.B, this.color.A);
 
                 GL.Begin(BeginMode.Quads);

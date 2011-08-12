@@ -37,6 +37,9 @@ namespace Device22
         public Vector3[] BoundingBoxV
         { get { return bbV; } }
 
+        // This is used to ensure the max. difference of 1 lod between two patches
+        public int UpdateToLevel = -1;
+
         // just for testing purpose
         public TerrainPatch(int startX, int startZ, int patchSize)
         {

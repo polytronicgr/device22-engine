@@ -8,8 +8,28 @@ using OpenTK.Graphics.OpenGL;
 
 namespace Device22
 {
+    public enum CubeFaceDirection
+    {
+        LEFT = 0,
+        TOP = 1,
+        RIGHT = 2,
+        BOTTOM = 3,
+        FRONT = 4,
+        BACK = 5
+    }
+
+    public enum CubeEdgeDirection
+    {
+        NORTH = 0,
+        EAST = 1,
+        SOUTH = 2,
+        WEST = 3
+    }
+
     public class Planet
     {
+        public static QuadTreeNode[,] LookupNeighbors;
+
         Terrain[] planetFace;
         QuadTree[] planetFaceQT;
         QuadTreeNode mainNode;
@@ -45,7 +65,7 @@ namespace Device22
                                         "earthcubemap_c04.jpg");
 
             // Top face:
-            planetFace[1] = new Terrain(new Vector3(-(terrainSize / 2), (terrainSize / 2) - 1, -(terrainSize / 2)),
+            planetFace[1] = new Terrain(new Vector3(-(terrainSize / 2), (terrainSize / 2), -(terrainSize / 2)),
                                         new Vector3(1.0f, 0.0f, 0.0f),
                                         new Vector3(0.0f, 0.0f, 1.0f),
                                         maxLOD,
@@ -56,7 +76,7 @@ namespace Device22
                                         "earthcubemap_c02.jpg");
 
             // Right face:
-            planetFace[2] = new Terrain(new Vector3((terrainSize / 2) - 1, -(terrainSize / 2) - 1, (terrainSize / 2) - 1),
+            planetFace[2] = new Terrain(new Vector3((terrainSize / 2), -(terrainSize / 2), (terrainSize / 2)),
                                         new Vector3(-1.0f, 0.0f, 0.0f),
                                         new Vector3(0.0f, 1.0f, 0.0f),
                                         maxLOD,
@@ -67,7 +87,7 @@ namespace Device22
                                         "earthcubemap_c05.jpg");
 
             // Bottom face:
-            planetFace[3] = new Terrain(new Vector3((terrainSize / 2) - 1, -(terrainSize / 2), -(terrainSize / 2)),
+            planetFace[3] = new Terrain(new Vector3((terrainSize / 2), -(terrainSize / 2), -(terrainSize / 2)),
                                         new Vector3(-1.0f, 0.0f, 0.0f),
                                         new Vector3(0.0f, 0.0f, 1.0f),
                                         maxLOD,
@@ -79,7 +99,7 @@ namespace Device22
             planetFaceQT[3] = new QuadTree(ref planetFace[3]);
 
             // Front face:
-            planetFace[4] = new Terrain(new Vector3(-(terrainSize / 2), (terrainSize / 2) - 1, -(terrainSize / 2)),
+            planetFace[4] = new Terrain(new Vector3(-(terrainSize / 2), (terrainSize / 2), -(terrainSize / 2)),
                                         new Vector3(0.0f, 0.0f, 1.0f),
                                         new Vector3(0.0f, -1.0f, 0.0f),
                                         maxLOD,
@@ -90,7 +110,7 @@ namespace Device22
                                         "earthcubemap_c00.jpg");
 
             // Back face:
-            planetFace[5] = new Terrain(new Vector3((terrainSize / 2) - 1, -(terrainSize / 2), -(terrainSize / 2)),
+            planetFace[5] = new Terrain(new Vector3((terrainSize / 2), -(terrainSize / 2), -(terrainSize / 2)),
                                         new Vector3(0.0f, 0.0f, 1.0f),
                                         new Vector3(0.0f, 1.0f, 0.0f),
                                         maxLOD,
@@ -114,16 +134,32 @@ namespace Device22
             mainNode.BoundingBox3D[7] = new Vector3((terrainSize / 2), (terrainSize / 2), -(terrainSize / 2));*/
             // Since its the first node, it gets the first id.
             mainNode.ID = -1;
+            
 
-            // Calculate and assign the nodes neighbors.
+            // Calculate quadtree.
             for (int i = 0; i < counter; i++)
             {
                 planetFaceQT[i] = new QuadTree(ref planetFace[i]);
                 planetFaceQT[i].MainNode.Parent = mainNode;
-                //QuadTreeNode mNode = planetFaceQT[i].MainNode;
-                //QuadTree.CalculateQuadtreeNeighbors(ref mNode);
             }
 
+            // Assign manually the specific node ids
+            planetFaceQT[0].MainNode.ID = 10 + (int)CubeFaceDirection.LEFT;
+            planetFaceQT[1].MainNode.ID = 10 + (int)CubeFaceDirection.TOP;
+            planetFaceQT[2].MainNode.ID = 10 + (int)CubeFaceDirection.RIGHT;
+            planetFaceQT[3].MainNode.ID = 10 + (int)CubeFaceDirection.BOTTOM;
+            planetFaceQT[4].MainNode.ID = 10 + (int)CubeFaceDirection.FRONT;
+            planetFaceQT[5].MainNode.ID = 10 + (int)CubeFaceDirection.BACK;
+
+            // Generate lookup table (ugle hack!)
+            if (LookupNeighbors == null) CreateNeighborLookupTable();
+
+            // Calculate and assign neighbors
+            for (int i = 0; i < counter; i++)
+            {
+                QuadTreeNode mNode = planetFaceQT[i].MainNode;
+                QuadTree.CalculateQuadtreeNeighbors(ref mNode);
+            }
 
             // try 1
             /*
@@ -166,8 +202,8 @@ namespace Device22
             // Calculate and assign the missing nodes neighbors.
             for (int i = 0; i < counter; i++)
             {
-                QuadTreeNode mNode = planetFaceQT[i].MainNode;
-                QuadTree.CalculateQuadtreeNeighbors(ref mNode);
+                //QuadTreeNode mNode = planetFaceQT[i].MainNode;
+                //QuadTree.CalculateQuadtreeNeighbors(ref mNode);
             }
 
 
@@ -226,6 +262,41 @@ namespace Device22
             
             
            Debug.Trace("Planet generated!");
+        }
+
+        public void CreateNeighborLookupTable()
+        {
+            LookupNeighbors = new QuadTreeNode[6, 4];
+            // Neighbors for the left face
+            LookupNeighbors[(int)CubeFaceDirection.LEFT, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.BOTTOM].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.LEFT, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.BACK].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.LEFT, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.TOP].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.LEFT, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.FRONT].MainNode;
+            // Neighbors for the top face
+            LookupNeighbors[(int)CubeFaceDirection.TOP, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.LEFT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.TOP, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.BACK].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.TOP, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.RIGHT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.TOP, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.FRONT].MainNode;
+            // Neighbors for the right face
+            LookupNeighbors[(int)CubeFaceDirection.RIGHT, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.BOTTOM].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.RIGHT, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.FRONT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.RIGHT, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.TOP].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.RIGHT, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.BACK].MainNode;
+            // Neighbors for the bottom face
+            LookupNeighbors[(int)CubeFaceDirection.BOTTOM, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.LEFT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BOTTOM, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.FRONT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BOTTOM, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.RIGHT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BOTTOM, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.BACK].MainNode;
+            // Neighbors for the front face
+            LookupNeighbors[(int)CubeFaceDirection.FRONT, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.TOP].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.FRONT, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.RIGHT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.FRONT, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.BOTTOM].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.FRONT, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.LEFT].MainNode;
+            // Neighbors for the back face
+            LookupNeighbors[(int)CubeFaceDirection.BACK, (int)CubeEdgeDirection.NORTH] = planetFaceQT[(int)CubeFaceDirection.BOTTOM].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BACK, (int)CubeEdgeDirection.EAST] = planetFaceQT[(int)CubeFaceDirection.LEFT].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BACK, (int)CubeEdgeDirection.SOUTH] = planetFaceQT[(int)CubeFaceDirection.TOP].MainNode;
+            LookupNeighbors[(int)CubeFaceDirection.BACK, (int)CubeEdgeDirection.WEST] = planetFaceQT[(int)CubeFaceDirection.RIGHT].MainNode;
         }
 
         public void Render(ref Frustum frustum)

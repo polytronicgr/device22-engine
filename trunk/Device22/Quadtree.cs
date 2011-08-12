@@ -15,6 +15,14 @@ namespace Device22
         SOUTH_EAST = 4
     }
 
+    public enum NodeNeighborDirection
+    {
+        NORTH = 1,
+        EAST = 2,
+        SOUTH = 3,
+        WEST = 4
+    }
+
     public class QuadTree
     {
         private QuadTreeNode mainNode;
@@ -316,6 +324,7 @@ namespace Device22
         private static QuadTreeNode FindNeighborNorth(ref QuadTreeNode node)
         {
             if (node.ID == -1) return null;
+            if ((node.ID >= 10) && (node.ID < 20)) return Planet.LookupNeighbors[node.ID - 10, (int)CubeEdgeDirection.NORTH];
             if (node.ID == (int)NodeDirection.SOUTH_WEST)
                 return node.Parent.NW;
             if (node.ID == (int)NodeDirection.SOUTH_EAST)
@@ -332,6 +341,7 @@ namespace Device22
         private static QuadTreeNode FindNeighborEast(ref QuadTreeNode node)
         {
             if (node.ID == -1) return null;
+            if ((node.ID >= 10) && (node.ID < 20)) return Planet.LookupNeighbors[node.ID - 10, (int)CubeEdgeDirection.EAST];
             if (node.ID == (int)NodeDirection.NORTH_WEST)
                 return node.Parent.NE;
             if (node.ID == (int)NodeDirection.SOUTH_WEST)
@@ -348,6 +358,7 @@ namespace Device22
         private static QuadTreeNode FindNeighborSouth(ref QuadTreeNode node)
         {
             if (node.ID == -1) return null;
+            if ((node.ID >= 10) && (node.ID < 20)) return Planet.LookupNeighbors[node.ID - 10, (int)CubeEdgeDirection.SOUTH];
             if (node.ID == (int)NodeDirection.NORTH_WEST)
                 return node.Parent.SW;
             if (node.ID == (int)NodeDirection.NORTH_EAST)
@@ -364,6 +375,7 @@ namespace Device22
         private static QuadTreeNode FindNeighborWest(ref QuadTreeNode node)
         {
             if (node.ID == -1) return null;
+            if ((node.ID >= 10) && (node.ID < 20)) return Planet.LookupNeighbors[node.ID - 10, (int)CubeEdgeDirection.WEST];
             if (node.ID == (int)NodeDirection.NORTH_EAST)
                 return node.Parent.NW;
             if (node.ID == (int)NodeDirection.SOUTH_EAST)
@@ -470,55 +482,89 @@ namespace Device22
             {
                 int maxLODLevels = terrainRef.LODLEVELS;
                 int patchResolution = mainNode.Patch.GetResolution(maxLODLevels);
+                if ((mainNode.Patch.UpdateToLevel > -1) && (mainNode.Patch.UpdateToLevel != patchResolution)) patchResolution = mainNode.Patch.UpdateToLevel;
                 int mainPatchIndexBuffer = terrainRef.IndexBuffer[patchResolution];
 
                 List<int> defaultBridgeIndexBuffer = new List<int>();
                 List<int> lowerBridgeIndexBuffer = new List<int>();
 
+                // for debug
+                /*
+                if ((mainNode.ID == (int)NodeDirection.NORTH_WEST) || (mainNode.ID == (int)NodeDirection.NORTH_EAST))
+                {
+                    Cube cube = new Cube(0);
+                    cube.setColor(new ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
+                    cube.setPosition(new Vector3(mainNode.Patch.CenterVertex));
+                    cube.setScale(new Vector3(15.0f, 15.0f, 15.0f));
+                    //cube.render(ref frustum);
+                }
+                 */
+
                 if (mainNode.Neighbor_N != null)
                 {
                     // check north neighbor patch resolution
-                    if (mainNode.Neighbor_N.Patch.GetResolution(maxLODLevels) > patchResolution)
+                    int nRes = mainNode.Neighbor_N.Patch.GetResolution(maxLODLevels);
+                    if (nRes > patchResolution)
+                    {
+                        if (nRes > patchResolution + 1) mainNode.Neighbor_N.Patch.UpdateToLevel = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 4]);
+                    }
                     else
+                    {
+                        mainNode.Neighbor_N.Patch.UpdateToLevel = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 0]);
+                    }
                 }
                 else
                     defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 0]);
                 if (mainNode.Neighbor_E != null)
                 {
                     // check east neighbor patch resolution
-                    if (mainNode.Neighbor_E.Patch.GetResolution(maxLODLevels) > patchResolution)
+                    int eRes = mainNode.Neighbor_E.Patch.GetResolution(maxLODLevels);
+                    if (eRes > patchResolution)
+                    {
+                        if (eRes > patchResolution + 1) mainNode.Neighbor_E.Patch.UpdateToLevel = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 5]);
+                    }
                     else
+                    {
+                        mainNode.Neighbor_E.Patch.UpdateToLevel = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 1]);
+                    }
                 }
                 else
                     defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 1]);
                 if (mainNode.Neighbor_S != null)
                 {
-                    /*
-                    Cube cube = new Cube(1);
-                    cube.setPosition(new Vector3(mainNode.Patch.CenterVertex));
-                    cube.setColor(new ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-                    cube.render(ref frustum);
-                     * */
-
                     // check south neighbor patch resolution
-                    if (mainNode.Neighbor_S.Patch.GetResolution(maxLODLevels) > patchResolution)
+                    int sRes = mainNode.Neighbor_S.Patch.GetResolution(maxLODLevels);
+                    if (sRes > patchResolution)
+                    {
+                        if (sRes > patchResolution + 1) mainNode.Neighbor_S.Patch.UpdateToLevel = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 6]);
+                    }
                     else
+                    {
+                        mainNode.Neighbor_S.Patch.UpdateToLevel = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 2]);
+                    }
                 }
                 else
                     defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 2]);
                 if (mainNode.Neighbor_W != null)
                 {
                     // check west neighbor patch resolution
-                    if (mainNode.Neighbor_W.Patch.GetResolution(maxLODLevels) > patchResolution)
+                    int wRes = mainNode.Neighbor_W.Patch.GetResolution(maxLODLevels);
+                    if (wRes > patchResolution)
+                    {
+                        if (wRes > patchResolution + 1) mainNode.Neighbor_W.Patch.UpdateToLevel = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 7]);
+                    }
                     else
+                    {
+                        mainNode.Neighbor_W.Patch.UpdateToLevel = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 3]);
+                    }
                 }
                 else
                     defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 3]);
