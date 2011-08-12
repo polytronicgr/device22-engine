@@ -171,7 +171,7 @@ namespace Device22
 
         public InFrustumCheck CubeInFrustum(TerrainPatch patch)
         {
-            return InFrustumCheck.IN;
+            //return InFrustumCheck.IN;
             int totalIn = 0;
             // Test all 6 sides against all 8 corners
             for (int s = 0; s < 6; s++)
@@ -212,7 +212,7 @@ namespace Device22
         //     The InFrustumCheck element describing the boundingbox behavior to the frustum (IN, INTERSECT or OUT)
     public InFrustumCheck CubeInFrustum(Vector3[] BoundingBox3D)
     {
-        return InFrustumCheck.IN;
+        //return InFrustumCheck.IN;
         int totalIn = 0;
         // Test all 6 sides against all 8 corners
         for (int s = 0; s < 6; s++)

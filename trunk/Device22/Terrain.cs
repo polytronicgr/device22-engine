@@ -76,7 +76,7 @@ namespace Device22
                 Core.ErrorExit("Error: (Class: Terrain) Heightmap not found!");
             }
 
-            //Bitmap bitmap = new Bitmap(heightmapURL);
+            Bitmap bitmap = new Bitmap(heightmapURL);
 
             texID = textureID;
             lodLevels = LODLevels;
@@ -99,6 +99,7 @@ namespace Device22
                     index = (z * terrainSize) + x;
                     // Since the heightmap is in greyscales, we can use any color channel
                     //if ((x < bitmap.Height) && (z < bitmap.Width)) height = bitmap.GetPixel(x, z).R * heightMult;
+                    height = bitmap.GetPixel(x, z).R * heightMult;
                     //vertArray[index] = new Vector3(x, height, z);
                     vertArray[index] = new Vector3(centerPos + (axisX) * ((x))
                                                              //+ (axisY / terrainScale) * ((terrainSize) / terrainScale)
@@ -110,6 +111,8 @@ namespace Device22
                     uvArray[index] = new Vector2((float)(1.0 / terrainSize * x), (float)(1.0 / terrainSize * z));
                 }
             }
+
+            bitmap.Dispose();
 
             // Vertices array holds all terrain vertices multiplied by the 3 coordinates (x, y and z)
             vertices = new List<Vector3>();

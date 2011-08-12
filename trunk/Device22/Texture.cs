@@ -42,7 +42,9 @@ namespace Device22
                 Rectangle rect = new Rectangle(0, 0, tex.bitmap.Width, tex.bitmap.Height);
                 System.Drawing.Imaging.BitmapData bitmapdata = tex.bitmap.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, tex.bitmap.Width, tex.bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, bitmapdata.Scan0);
+                //GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, tex.bitmap.Width, tex.bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, bitmapdata.Scan0);
+                // Why Bgra and not Rgba? -> http://stackoverflow.com/questions/5123387/loading-a-bmp-into-an-opengl-textures-switches-the-red-and-blue-colors-c-wind
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, tex.bitmap.Width, tex.bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, bitmapdata.Scan0);
                 
                 tex.bitmap.Dispose();
                 return tex.ID;

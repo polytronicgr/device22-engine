@@ -214,18 +214,30 @@ namespace Device22
         private void AssignBoundingBox3D(ref QuadTreeNode node, int topLeftVertex, int topRightVertex, int bottomLeftVertex, int bottomRightVertex)
         {
             // Calculate the highest point of the terrain patch
-            Vector3 highestV = new Vector3(0, 0, 0);
+            // First use a dummy so we make sure that we get the highest point.
+            Vector3 highestV = new Vector3(terrainRef.Vertices[0].X - 999, terrainRef.Vertices[0].Y - 999, terrainRef.Vertices[0].Z - 999);
             for (int z = topLeftVertex; z <= bottomLeftVertex; z += terrainRef.Width)
             {
                 for (int x = z; x < (z + (topRightVertex - topLeftVertex) + 1); x++)
                 {
+                    if (terrainRef.Vertices[x].X > highestV.X)
+                    {
+                        highestV.X = terrainRef.Vertices[x].X;
+                    }
                     if (terrainRef.Vertices[x].Y > highestV.Y)
                     {
                         highestV.Y = terrainRef.Vertices[x].Y;
                     }
+                    if (terrainRef.Vertices[x].Z > highestV.Z)
+                    {
+                        highestV.Z = terrainRef.Vertices[x].Z;
+                    }
                 }
             }
+            // This prevents a bounding box with a height, width and length of 0
+            if (highestV.X == 0.0f) { highestV.X = 1.0f; }
             if (highestV.Y == 0.0f) { highestV.Y = 1.0f; }
+            if (highestV.Z == 0.0f) { highestV.Z = 1.0f; }
 
             Vector3 lowestV = new Vector3(highestV);
             // Calculate the lowest point. Used to calculate the boundingbox later on
@@ -233,9 +245,17 @@ namespace Device22
             {
                 for (int x = z; x < (z + (topRightVertex - topLeftVertex) + 1); x++)
                 {
+                    if (terrainRef.Vertices[x].X < lowestV.X)
+                    {
+                        lowestV.X = terrainRef.Vertices[x].X;
+                    }
                     if (terrainRef.Vertices[x].Y < lowestV.Y)
                     {
                         lowestV.Y = terrainRef.Vertices[x].Y;
+                    }
+                    if (terrainRef.Vertices[x].Z < lowestV.Z)
+                    {
+                        lowestV.Z = terrainRef.Vertices[x].Z;
                     }
                 }
             }
@@ -249,22 +269,22 @@ namespace Device22
 
             // Calculate the 3d bounding box
             Vector3[] bbV = new Vector3[8];
-            // corner: bottom half, back, left
-            bbV[0] = new Vector3(node.BoundingBox2D[0].X, lowestV.Y, node.BoundingBox2D[0].Z);
+            // corner: bottom half(Y), back(X), left(Z)
+            bbV[0] = new Vector3(lowestV.X, lowestV.Y, lowestV.Z);
             // corner: bottom half, back, right
-            bbV[1] = new Vector3(node.BoundingBox2D[1].X, lowestV.Y, node.BoundingBox2D[1].Z);
+            bbV[1] = new Vector3(lowestV.X, lowestV.Y, highestV.Z);
             // corner: bottom half, front, left
-            bbV[2] = new Vector3(node.BoundingBox2D[2].X, lowestV.Y, node.BoundingBox2D[2].Z);
+            bbV[2] = new Vector3(highestV.X, lowestV.Y, lowestV.Z);
             // corner: bottom half, front, right
-            bbV[3] = new Vector3(node.BoundingBox2D[3].X, lowestV.Y, node.BoundingBox2D[3].Z);
+            bbV[3] = new Vector3(highestV.X, lowestV.Y, highestV.Z);
             // corner: top half, back, left
-            bbV[4] = new Vector3(node.BoundingBox2D[0].X, highestV.Y, node.BoundingBox2D[0].Z);
+            bbV[4] = new Vector3(lowestV.X, highestV.Y, lowestV.Z);
             // corner: top half, back, right
-            bbV[5] = new Vector3(node.BoundingBox2D[1].X, highestV.Y, node.BoundingBox2D[1].Z);
+            bbV[5] = new Vector3(lowestV.X, highestV.Y, highestV.Z);
             // corner: top half, front, left
-            bbV[6] = new Vector3(node.BoundingBox2D[2].X, highestV.Y, node.BoundingBox2D[2].Z);
+            bbV[6] = new Vector3(highestV.X, highestV.Y, lowestV.Z);
             // corner: top half, front, right
-            bbV[7] = new Vector3(node.BoundingBox2D[3].X, highestV.Y, node.BoundingBox2D[3].Z);
+            bbV[7] = new Vector3(highestV.X, highestV.Y, highestV.Z);
 
             node.BoundingBox3D = bbV;
         }
@@ -430,12 +450,8 @@ namespace Device22
 
                 if (terrainRef.TextureID != -1)
                 {
-                    Texture.Bind(terrainRef.TextureID);
                     GL.Enable(EnableCap.Texture2D);
-                }
-                else
-                {
-                    GL.Color3(0, 255, 0);
+                    Texture.Bind(terrainRef.TextureID);
                 }
 
                 CheckNodeInsideFrustum(ref frustum, ref mainNode, checkFrustum);
@@ -444,6 +460,7 @@ namespace Device22
                 {
                     GL.Disable(EnableCap.Texture2D);
                 }
+
                 GL.DisableClientState(ArrayCap.TextureCoordArray);
                 GL.DisableClientState(ArrayCap.VertexArray);
                 Core.popState();
@@ -482,23 +499,11 @@ namespace Device22
             {
                 int maxLODLevels = terrainRef.LODLEVELS;
                 int patchResolution = mainNode.Patch.GetResolution(maxLODLevels);
-                if ((mainNode.Patch.UpdateToLevel > -1) && (mainNode.Patch.UpdateToLevel != patchResolution)) patchResolution = mainNode.Patch.UpdateToLevel;
+                if ((mainNode.Patch.UpdateToResolution > -1) && (mainNode.Patch.UpdateToResolution != patchResolution)) patchResolution = mainNode.Patch.UpdateToResolution;
                 int mainPatchIndexBuffer = terrainRef.IndexBuffer[patchResolution];
 
                 List<int> defaultBridgeIndexBuffer = new List<int>();
                 List<int> lowerBridgeIndexBuffer = new List<int>();
-
-                // for debug
-                /*
-                if ((mainNode.ID == (int)NodeDirection.NORTH_WEST) || (mainNode.ID == (int)NodeDirection.NORTH_EAST))
-                {
-                    Cube cube = new Cube(0);
-                    cube.setColor(new ColorRGBA(1.0f, 0.0f, 0.0f, 1.0f));
-                    cube.setPosition(new Vector3(mainNode.Patch.CenterVertex));
-                    cube.setScale(new Vector3(15.0f, 15.0f, 15.0f));
-                    //cube.render(ref frustum);
-                }
-                 */
 
                 if (mainNode.Neighbor_N != null)
                 {
@@ -506,12 +511,12 @@ namespace Device22
                     int nRes = mainNode.Neighbor_N.Patch.GetResolution(maxLODLevels);
                     if (nRes > patchResolution)
                     {
-                        if (nRes > patchResolution + 1) mainNode.Neighbor_N.Patch.UpdateToLevel = patchResolution * 2;
+                        if (nRes > patchResolution * 2) mainNode.Neighbor_N.Patch.UpdateToResolution = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 4]);
                     }
                     else
                     {
-                        mainNode.Neighbor_N.Patch.UpdateToLevel = -1;
+                        mainNode.Neighbor_N.Patch.UpdateToResolution = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 0]);
                     }
                 }
@@ -523,12 +528,12 @@ namespace Device22
                     int eRes = mainNode.Neighbor_E.Patch.GetResolution(maxLODLevels);
                     if (eRes > patchResolution)
                     {
-                        if (eRes > patchResolution + 1) mainNode.Neighbor_E.Patch.UpdateToLevel = patchResolution * 2;
+                        if (eRes > patchResolution * 2) mainNode.Neighbor_E.Patch.UpdateToResolution = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 5]);
                     }
                     else
                     {
-                        mainNode.Neighbor_E.Patch.UpdateToLevel = -1;
+                        mainNode.Neighbor_E.Patch.UpdateToResolution = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 1]);
                     }
                 }
@@ -540,12 +545,12 @@ namespace Device22
                     int sRes = mainNode.Neighbor_S.Patch.GetResolution(maxLODLevels);
                     if (sRes > patchResolution)
                     {
-                        if (sRes > patchResolution + 1) mainNode.Neighbor_S.Patch.UpdateToLevel = patchResolution * 2;
+                        if (sRes > patchResolution * 2) mainNode.Neighbor_S.Patch.UpdateToResolution = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 6]);
                     }
                     else
                     {
-                        mainNode.Neighbor_S.Patch.UpdateToLevel = -1;
+                        mainNode.Neighbor_S.Patch.UpdateToResolution = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 2]);
                     }
                 }
@@ -557,12 +562,12 @@ namespace Device22
                     int wRes = mainNode.Neighbor_W.Patch.GetResolution(maxLODLevels);
                     if (wRes > patchResolution)
                     {
-                        if (wRes > patchResolution + 1) mainNode.Neighbor_W.Patch.UpdateToLevel = patchResolution * 2;
+                        if (wRes > patchResolution * 2) mainNode.Neighbor_W.Patch.UpdateToResolution = patchResolution * 2;
                         lowerBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 7]);
                     }
                     else
                     {
-                        mainNode.Neighbor_W.Patch.UpdateToLevel = -1;
+                        mainNode.Neighbor_W.Patch.UpdateToResolution = -1;
                         defaultBridgeIndexBuffer.Add(terrainRef.BridgeIndexBuffer[patchResolution, 3]);
                     }
                 }
