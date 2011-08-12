@@ -48,12 +48,13 @@ namespace Device22
             BoundingBox3D = new Vector3[8];
         }
 
-        public QuadTreeNode GetChild(int id)
+        // used to get the children at runtime
+        public QuadTreeNode GetChild(int nodeDirection)
         {
-            if ((id < 1) && (id > 4)) return null;
-            if (id == 1) return NW;
-            if (id == 2) return NE;
-            if (id == 3) return SW;
+            if ((nodeDirection < 1) && (nodeDirection > 4)) return null;
+            if (nodeDirection == 1) return NW;
+            if (nodeDirection == 2) return NE;
+            if (nodeDirection == 3) return SW;
             return SE;
         }
 
