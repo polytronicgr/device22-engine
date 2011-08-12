@@ -34,21 +34,21 @@ namespace Device22
         QuadTree[] planetFaceQT;
         QuadTreeNode mainNode;
 
-        // always 4 patches per terrain, for now.
+        // always 4 patches per terrain, for now. Or 4^N.
         private int terrainSize = 1025;
-        private int patchSize = 513;
+        private int patchSize = 257;
         private float planetRadius = 100.0f;
         private int counter = 6;
         private int maxLOD = 6;
 
         public Planet()
         {
-            int tex0 = -1; //Texture.loadFromFile("earthcubemap_tex_c04.bmp");
-            int tex1 = -1; //Texture.loadFromFile("earthcubemap_tex_c02.bmp");
-            int tex2 = -1; //Texture.loadFromFile("earthcubemap_tex_c05.bmp");
-            int tex3 = -1; //Texture.loadFromFile("earthcubemap_tex_c03.bmp");
-            int tex4 = -1; //Texture.loadFromFile("earthcubemap_tex_c00.bmp");
-            int tex5 = -1; //Texture.loadFromFile("earthcubemap_tex_c01.bmp");
+            int tex0 = Texture.loadFromFile("earthtexture_high_c04.jpg"); //earthcubemap_tex_c04.bmp");
+            int tex1 = Texture.loadFromFile("earthtexture_high_c02.jpg"); //earthcubemap_tex_c02.bmp");
+            int tex2 = Texture.loadFromFile("earthtexture_high_c05.jpg"); //earthcubemap_tex_c05.bmp");
+            int tex3 = Texture.loadFromFile("earthtexture_high_c03.jpg"); //earthcubemap_tex_c03.bmp");
+            int tex4 = Texture.loadFromFile("earthtexture_high_c00.jpg"); //earthcubemap_tex_c00.bmp");
+            int tex5 = Texture.loadFromFile("earthtexture_high_c01.jpg"); //earthcubemap_tex_c01.bmp");
 
             planetFace = new Terrain[counter];
             planetFaceQT = new QuadTree[counter];

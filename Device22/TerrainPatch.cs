@@ -38,7 +38,7 @@ namespace Device22
         { get { return bbV; } }
 
         // This is used to ensure the max. difference of 1 lod between two patches
-        public int UpdateToLevel = -1;
+        public int UpdateToResolution = -1;
 
         // just for testing purpose
         public TerrainPatch(int startX, int startZ, int patchSize)
@@ -109,39 +109,72 @@ namespace Device22
 
             centerV = vertices[vertices.Count / 2];
 
-            highestV = new Vector3(0, 0, 0);
-            // Calculate the highest point. Used to calculate the boundingbox later on
+            // Calculate the highest point of the terrain patch
+            // First use a dummy so we make sure that we get the highest point.
+            highestV = new Vector3(vertices[0].X - 999, vertices[0].Y - 999, vertices[0].Z - 999);
             for (int i = 0; i < vertices.Count; i++)
             {
-                if (vertices[i].Y > highestV.Y) { highestV = vertices[i]; }
+                if (vertices[i].X > highestV.X)
+                {
+                    highestV.X = vertices[i].X;
+                }
+                if (vertices[i].Y > highestV.Y)
+                {
+                    highestV.Y = vertices[i].Y;
+                }
+                if (vertices[i].Z > highestV.Z)
+                {
+                    highestV.Z = vertices[i].Z;
+                }
             }
+            // This prevents a bounding box with a height, width and length of 0
+            if (highestV.X == 0.0f) { highestV.X = 1.0f; }
             if (highestV.Y == 0.0f) { highestV.Y = 1.0f; }
+            if (highestV.Z == 0.0f) { highestV.Z = 1.0f; }
 
             lowestV = new Vector3(highestV);
             // Calculate the lowest point. Used to calculate the boundingbox later on
             for (int i = 0; i < vertices.Count; i++)
             {
-                if (vertices[i].Y < lowestV.Y) { lowestV = vertices[i]; }
+                if (vertices[i].X < lowestV.X)
+                {
+                    lowestV.X = vertices[i].X;
+                }
+                if (vertices[i].Y < lowestV.Y)
+                {
+                    lowestV.Y = vertices[i].Y;
+                }
+                if (vertices[i].Z < lowestV.Z)
+                {
+                    lowestV.Z = vertices[i].Z;
+                }
             }
+
+            // X und Z müssen durch die spherische Verschiebungen AUCH neuberechnet werden!!!
+            // !!!!!!!!!!!!!!!!!
+            // Nicht vergessen, dies dann auch in der BA zu ändern.
+
+
+            //highestV.Y = lowestV.Y = 0;
 
             // Calculate the 3d bounding box
             bbV = new Vector3[8];
-            // corner: bottom half, back, left
-            bbV[0] = new Vector3(boundingBox[0].X, lowestV.Y, boundingBox[0].Z);
+            // corner: bottom half(Y), back(X), left(Z)
+            bbV[0] = new Vector3(lowestV.X, lowestV.Y, lowestV.Z);
             // corner: bottom half, back, right
-            bbV[1] = new Vector3(boundingBox[1].X, lowestV.Y, boundingBox[1].Z);
+            bbV[1] = new Vector3(lowestV.X, lowestV.Y, highestV.Z);
             // corner: bottom half, front, left
-            bbV[2] = new Vector3(boundingBox[2].X, lowestV.Y, boundingBox[2].Z);
+            bbV[2] = new Vector3(highestV.X, lowestV.Y, lowestV.Z);
             // corner: bottom half, front, right
-            bbV[3] = new Vector3(boundingBox[3].X, lowestV.Y, boundingBox[3].Z);
+            bbV[3] = new Vector3(highestV.X, lowestV.Y, highestV.Z);
             // corner: top half, back, left
-            bbV[4] = new Vector3(boundingBox[0].X, highestV.Y, boundingBox[0].Z);
+            bbV[4] = new Vector3(lowestV.X, highestV.Y, lowestV.Z);
             // corner: top half, back, right
-            bbV[5] = new Vector3(boundingBox[1].X, highestV.Y, boundingBox[1].Z);
+            bbV[5] = new Vector3(lowestV.X, highestV.Y, highestV.Z);
             // corner: top half, front, left
-            bbV[6] = new Vector3(boundingBox[2].X, highestV.Y, boundingBox[2].Z);
+            bbV[6] = new Vector3(highestV.X, highestV.Y, lowestV.Z);
             // corner: top half, front, right
-            bbV[7] = new Vector3(boundingBox[3].X, highestV.Y, boundingBox[3].Z);
+            bbV[7] = new Vector3(highestV.X, highestV.Y, highestV.Z);
 
             // For debug
             int size;

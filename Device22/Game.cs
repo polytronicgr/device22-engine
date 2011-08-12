@@ -124,7 +124,7 @@ namespace Device22
             GL.Enable(EnableCap.ColorMaterial);
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.Enable(EnableCap.CullFace);
-            //GL.Enable(EnableCap.Lighting);
+            GL.Enable(EnableCap.Lighting);
 
             Debug.On = false;
 
@@ -132,9 +132,9 @@ namespace Device22
             camera.Position(0, 0, 1,   0, 0, 0,   0, 1, 0);
 
             GL.Enable(EnableCap.Light0);
-            GL.Light(LightName.Light0, LightParameter.Position, new Vector4(new Vector3(0, 0, 0)));
-            GL.Light(LightName.Light0, LightParameter.Ambient, new Color4(255, 255, 255, 0));
-            GL.Light(LightName.Light0, LightParameter.Diffuse, new Color4(255, 100, 0, 0));
+            GL.Light(LightName.Light0, LightParameter.Position, new Vector4(new Vector3(0, 500, 0)));
+            GL.Light(LightName.Light0, LightParameter.Ambient, new Color4(255, 255, 255, 255));
+            GL.Light(LightName.Light0, LightParameter.Diffuse, new Color4(255, 255, 255, 255));
 
             MouseFunctions.setPosition(new Point(Game.width >> 1, Game.height >> 1));
             Mouse.ButtonDown += new EventHandler<MouseButtonEventArgs>(mouseDownEvents);
@@ -151,15 +151,6 @@ namespace Device22
             //Core.Shader.Init();
 
             frustum = new Frustum();
-
-            cube = new VBOCube[10];
-            for (int i = 0; i < maxCubes; i++)
-            {
-                cube[i] = new VBOCube(i);
-                cube[i].setColor(new ColorRGBA(180, 20, 20, 0));
-                cube[i].setPosition(new Vector3((float)Math2.randomNumber(0, 25), 0, (float)Math2.randomNumber(0, 25)));
-            }
-            cube[0].setPosition(Vector3.Zero);
 
             earth = new Planet();
             
@@ -226,9 +217,9 @@ namespace Device22
             polyCount = 0;
 
             GL.Color3(255, 255, 255);
-            //GL.ClearColor(0.2f, 0.2f, 0.8f, 0.0f);
             GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
             //GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.MatrixMode(MatrixMode.Modelview);
 
@@ -236,11 +227,6 @@ namespace Device22
             GL.LoadIdentity();
             camera.Look();
             frustum.CalculateFrustum();
-
-            for (int i = 0; i < maxCubes; i++)
-            {
-                //cube[i].render(ref frustum);
-            }
             
             earth.Render(ref frustum);
 
