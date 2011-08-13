@@ -28,7 +28,9 @@ Occlusion Culling?
 
 Objekte nicht rendern, wenn Screen-Space-Größe > 1px
 
-AABB Frustum Culling überprüfen!
+Redundante Detail Texture?
+
+Verdeckte Patches ausblenden.
 
 Patchbridges mit FrontFaceCulling anpassen
 

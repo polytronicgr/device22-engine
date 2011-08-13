@@ -9,7 +9,7 @@ namespace Device22
 {
     public class TerrainPatch
     {
-        private const float distanceFactor = 20.0f;
+        private const float distanceFactor = 50.0f;
 
         private int id;
         public int ID
@@ -232,13 +232,37 @@ namespace Device22
             return patchResolution;
         }
 
-        public void Render(int mainPatchIndexBuffer, int[] defaultBridgeIndexBuffer, int[] lowerBridgeIndexBuffer, int[] indicesCount)
+        public void Render(int mainPatchIndexBuffer, int[] defaultBridgeIndexBuffer, int[] lowerBridgeIndexBuffer, int[] indicesCount, int textureID, int detailtextureID)
         {
             // for debug
             //Debug.BoundingBox.Render(bbV);
 
+            GL.ClientActiveTexture(TextureUnit.Texture0);
+            GL.Enable(EnableCap.Texture2D);
+            Texture.Bind(textureID);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Replace);
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.textureBuffer);
             GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, new IntPtr(0));
+
+            /*
+            GL.ClientActiveTexture(TextureUnit.Texture1);
+            GL.Enable(EnableCap.Texture2D);
+            Texture.Bind(detailtextureID);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvMode.Modulate);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Source0Rgb, (int)TextureEnvModeSource.Previous);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Rgb, (int)TextureEnvModeSource.Texture);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Operand0Rgb, (int)TextureEnvModeOperandRgb.SrcColor);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Operand1Rgb, (int)TextureEnvModeOperandRgb.SrcColor);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineAlpha, (int)TextureEnvMode.Modulate);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src0Alpha, (int)TextureEnvModeSource.Previous);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Src1Alpha, (int)TextureEnvModeSource.Texture);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Operand0Alpha, (int)TextureEnvModeOperandRgb.SrcAlpha);
+            GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Operand1Alpha, (int)TextureEnvModeOperandRgb.SrcAlpha);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, this.textureBuffer);
+            GL.TexCoordPointer(2, TexCoordPointerType.Float, 0, new IntPtr(0));
+            //GL.ClientActiveTexture(TextureUnit.Texture0);
+             */
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, this.vertexBuffer);
             GL.VertexPointer(3, VertexPointerType.Float, 0, new IntPtr(0));

@@ -61,6 +61,9 @@ namespace Device22
         private int texID;
         public int TextureID
         { get { return texID; } }
+        private int detailtexID;
+        public int DetailTextureID
+        { get { return detailtexID; } }
 
         private float heightMult = 0.01f;
 
@@ -85,6 +88,8 @@ namespace Device22
             radius = planetRadius;
             // Number of patches per row
             ppR = (terrainSize - 1) / patchSize;
+
+            detailtexID = Texture.loadFromFile("detail.jpg");
 
             // Temp arrays to ease the vertex and uv calculation
             Vector3[] vertArray = new Vector3[terrainSize * terrainSize];

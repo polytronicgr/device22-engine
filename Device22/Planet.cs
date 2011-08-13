@@ -39,7 +39,7 @@ namespace Device22
         private int patchSize = 257;
         private float planetRadius = 100.0f;
         private int counter = 6;
-        private int maxLOD = 6;
+        private int maxLOD = 7;
 
         public Planet()
         {
