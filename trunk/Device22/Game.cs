@@ -60,8 +60,8 @@ namespace Device22
 
         private InputController input;
         private Frustum frustum;
-        public static int height = 800;
-        public static int width = 800;
+        public static int height = 768;
+        public static int width = 1280;
 
         public int polyCount = 0;
 
@@ -141,7 +141,7 @@ namespace Device22
             //Mouse.Move += new EventHandler<MouseMoveEventArgs>(Primitive.MouseMoveEvent);             // Object picking
 
             font = new TrueTypeFont(new Font("Times New Roman", 20f, FontStyle.Bold), true);
-            font.color = new Vector3(1.0f, 0.0f, 1.0f);
+            font.color = new Vector3(1.0f, 1.0f, 1.0f);
 
             if (!loadContent()) { Core.ErrorExit("Error loading content"); }
         }
@@ -217,8 +217,8 @@ namespace Device22
             polyCount = 0;
 
             GL.Color3(255, 255, 255);
-            GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-            //GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            //GL.ClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+            GL.ClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.MatrixMode(MatrixMode.Modelview);
@@ -230,7 +230,7 @@ namespace Device22
             
             earth.Render(ref frustum);
 
-            // font.drawString(5, 1.5f, "Hello World\nI am glad to meet you.", .01f, .01f, TrueTypeFont.ALIGN_LEFT);
+            font.drawString(5, 1.5f, "Willkommen!\nHier im innern der Erde sieht man gut die\nsphärische Projektion des Würfels, nicht wahr?\nMit W|A|S|D wird übrigends die Kamera bewegt.", .01f, .01f, TrueTypeFont.ALIGN_LEFT);
 
             Title = String.Format("FPS={0:0}", Core.Fps.Get(e.Time)) + String.Format(" Polygons rendered={0:0}", polyCount);
 

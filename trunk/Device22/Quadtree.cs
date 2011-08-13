@@ -438,7 +438,7 @@ namespace Device22
                 // if all boundingbox corner where inside the frustum, there is no need to check the childs too
                 if (nodeInFrustum == Frustum.InFrustumCheck.IN) { checkFrustum = false; }
 
-                Core.pushState();
+                Core.PushState();
                 //GL.Scale(terrainRef.scale);
                 //GL.Translate(terrainRef.position);
 
@@ -450,20 +450,32 @@ namespace Device22
 
                 if (terrainRef.TextureID != -1)
                 {
+                    /*
+                    GL.ClientActiveTexture(TextureUnit.Texture0);
                     GL.Enable(EnableCap.Texture2D);
                     Texture.Bind(terrainRef.TextureID);
+                    GL.ClientActiveTexture(TextureUnit.Texture1);
+                    GL.Enable(EnableCap.Texture2D);
+                    Texture.Bind(terrainRef.DetailTextureID);
+                    GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode, (int)TextureEnvMode.Combine);
+                    GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.CombineRgb, (int)TextureEnvMode.Modulate);
+                     */
+                    //GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.Source0Rgb, (int)TextureEnvModeSource.Texture1);
+
+                    //GL.ClientActiveTexture(TextureUnit.Texture0);
                 }
 
                 CheckNodeInsideFrustum(ref frustum, ref mainNode, checkFrustum);
 
                 if (terrainRef.TextureID != -1)
                 {
-                    GL.Disable(EnableCap.Texture2D);
+                    GL.ClientActiveTexture(TextureUnit.Texture0);
+                    //GL.Disable(EnableCap.Texture2D);
                 }
 
                 GL.DisableClientState(ArrayCap.TextureCoordArray);
                 GL.DisableClientState(ArrayCap.VertexArray);
-                Core.popState();
+                Core.PopState();
             }
             return;
         }
@@ -579,7 +591,7 @@ namespace Device22
                 indicesCount[1] = terrainRef.BridgeIndicesCount[0, patchResolution];        // default bridge indices count
                 indicesCount[2] = terrainRef.BridgeIndicesCount[1, patchResolution];        // lower bridge indices count
 
-                mainNode.Patch.Render(mainPatchIndexBuffer, defaultBridgeIndexBuffer.ToArray(), lowerBridgeIndexBuffer.ToArray(), indicesCount);
+                mainNode.Patch.Render(mainPatchIndexBuffer, defaultBridgeIndexBuffer.ToArray(), lowerBridgeIndexBuffer.ToArray(), indicesCount, terrainRef.TextureID, terrainRef.DetailTextureID);
             }
             return;
         }

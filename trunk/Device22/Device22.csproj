@@ -49,6 +49,7 @@
     <Compile Include="Primitives.cs" />
     <Compile Include="Quadtree.cs" />
     <Compile Include="QuadtreeNode.cs" />
+    <Compile Include="Scene.cs" />
     <Compile Include="Terrain.cs" />
     <Compile Include="TerrainPatch.cs" />
     <None Include="TestTerrain.cs.save" />

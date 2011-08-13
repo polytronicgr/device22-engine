@@ -331,8 +331,9 @@ namespace Device22
             GL.BlendFunc(BlendingFactorSrc.SrcAlpha, BlendingFactorDest.OneMinusSrcAlpha);
             GL.Enable(EnableCap.Texture2D);
 			GL.BindTexture(TextureTarget.Texture2D, fontTextureID);
-            GL.Translate(new Vector3(0, 5, 0));
+            GL.Translate(new Vector3(-10, 3, -12));
             GL.Rotate(180, new Vector3(0, 0, 1));
+            GL.Rotate(180, new Vector3(0, 1, 0));
 			GL.Begin(BeginMode.Quads);
 	
 			while (i >= startIndex && i <= endIndex) {

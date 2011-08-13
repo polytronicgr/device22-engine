@@ -182,13 +182,13 @@ namespace Device22
             }
         }
 
-        public static void pushState()
+        public static void PushState()
         {
             GL.PushClientAttrib(ClientAttribMask.ClientAllAttribBits);              // wird das hier benötigt?
             GL.PushMatrix();
         }
 
-        public static void popState()
+        public static void PopState()
         {
             GL.PopClientAttrib();
             GL.PopMatrix();
