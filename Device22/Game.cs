@@ -63,6 +63,8 @@ namespace Device22
         public static int height = 768;
         public static int width = 1280;
 
+        private float elapsedTime = 0.0f;
+
         public int polyCount = 0;
 
         private int maxCubes = 1;
@@ -128,8 +130,7 @@ namespace Device22
 
             Debug.On = false;
 
-            camera = new Camera(0.1f, 2000.0f);
-            camera.Position(0, 0, 1,   0, 0, 0,   0, 1, 0);
+            camera = new Camera(0.1f, 2000.0f, 1.0f);
 
             GL.Enable(EnableCap.Light0);
             GL.Light(LightName.Light0, LightParameter.Position, new Vector4(new Vector3(0, 500, 0)));
@@ -159,16 +160,13 @@ namespace Device22
 
         protected override void OnResize(EventArgs e)
         {
+            base.OnResize(e);
+
             GL.Viewport(ClientRectangle.X, ClientRectangle.Y, ClientRectangle.Width, ClientRectangle.Height);
 
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView((float)Math.PI / 4, Width / (float)Height, camera.near, camera.far);
             GL.MatrixMode(MatrixMode.Projection);
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)(Width / Height), camera.near, camera.far);
             GL.LoadMatrix(ref projection);
-
-            GL.MatrixMode(MatrixMode.Modelview);
-            GL.LoadIdentity();
-
-            base.OnResize(e);
         }
 
         private void mouseDownEvents(object sender, MouseButtonEventArgs m)
@@ -186,25 +184,51 @@ namespace Device22
         protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
-            float speed = camera.Speed * 2.0f;
+            elapsedTime += (float)e.Time;
 
             if (Keyboard[Key.Escape])
                 Exit();
 
             if (Keyboard[Key.W])
-                camera.MoveView(speed);
+                camera.moveUp();
 
             if (Keyboard[Key.S])
-                camera.MoveView(-speed);
+                camera.moveDown();
 
             if (Keyboard[Key.A])
-                camera.StrafeView(-speed);
+                camera.moveLeft();
 
             if (Keyboard[Key.D])
-                camera.StrafeView(speed);
+                camera.moveRight();
 
             if (Keyboard[Key.P])
                 Core.ChangeWireframeMode();
+
+            if (Mouse[MouseButton.Right])
+            {
+                camera.mousing = true;
+
+                if (keyPressed[(int)MouseButton.Right])
+                {
+                    keyPressed[(int)MouseButton.Right] = false;
+                    camera.setLastMousePos(MouseFunctions.getPosition());
+                }
+            }
+            else if (Mouse[(int)MouseButton.Left])
+            {
+                if (keyPressed[(int)MouseButton.Left])
+                {
+                    keyPressed[(int)MouseButton.Left] = false;
+                    //Primitive.MouseDownEvent(MouseFunctions.getPosition());
+                }
+            }
+            else
+            {
+                if (camera.mousing)
+                {
+                    camera.mousing = false;
+                }
+            }
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -223,9 +247,8 @@ namespace Device22
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.MatrixMode(MatrixMode.Modelview);
 
-            camera.Update();
-            GL.LoadIdentity();
-            camera.Look();
+            camera.update(MouseFunctions.getPosition());
+
             frustum.CalculateFrustum();
             
             earth.Render(ref frustum);

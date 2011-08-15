@@ -4,6 +4,7 @@
 	Frustum Culling
 	Geomipmapping
 
+!! Compile einmal mit V-Sync und einmal ohne!
 Kommentare auf Englisch und Punkt/Komma überprüfen! Dies dann auch in der BA ändern!
 
 Quadtree + PVS + crack avoiding (GeoMorphing) implemenieren!
