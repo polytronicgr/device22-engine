@@ -213,8 +213,8 @@ namespace Device22
 
         private void AssignBoundingBox3D(ref QuadTreeNode node, int topLeftVertex, int topRightVertex, int bottomLeftVertex, int bottomRightVertex)
         {
-            // Calculate the highest point of the terrain patch
-            // First use a dummy so we make sure that we get the highest point.
+            // Calculate the highest point of the terrain patch.
+            // First use a dummy to make sure that we get the highest point.
             Vector3 highestV = new Vector3(terrainRef.Vertices[0].X - 999, terrainRef.Vertices[0].Y - 999, terrainRef.Vertices[0].Z - 999);
             for (int z = topLeftVertex; z <= bottomLeftVertex; z += terrainRef.Width)
             {
@@ -260,14 +260,10 @@ namespace Device22
                 }
             }
 
-            // X und Z müssen durch die spherische Verschiebungen AUCH neuberechnet werden!!!
-            // !!!!!!!!!!!!!!!!!
-            // Nicht vergessen, dies dann auch in der BA zu ändern.
-
 
             //highestV.Y = lowestV.Y = 0;
 
-            // Calculate the 3d bounding box
+            // Calculate the 3d bounding box.
             Vector3[] bbV = new Vector3[8];
             // corner: bottom half(Y), back(X), left(Z)
             bbV[0] = new Vector3(lowestV.X, lowestV.Y, lowestV.Z);
